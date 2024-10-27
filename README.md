@@ -1,4 +1,4 @@
-# node-shop <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/240px-Node.js_logo.svg.png" width="180" height="80">
+# node-shop <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/240px-Node.js_logo.svg.png" width="180" height="90">
 A minimal MPA created with Node.js
 # Installation:
 Have node installed (Obviously).<br><br>
