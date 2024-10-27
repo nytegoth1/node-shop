@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <style>
+        .product {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        #load-more {
+            display: none;
+            margin: 20px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.0/css/all.min.css'>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    
+    <nav>
+        <div class="nav-container">
+            <div class="main-menu-wrapper__left">
+                <div onclick="goToHome()" class="main-menu-wrapper__logo">
+                <div class="logo">MySite</div>
+                </div>
+            </div>
+            <input type="text" id="search" placeholder="Search for products..." oninput="filterProducts()">
+            <div id="categories"></div>
+            <button class="category-button" onclick="showAllProducts()">Show All Products</button>
+            <button class="category-button" onclick="goToCart()">View Cart <i id="cart-count" class="fas fa-shopping-cart"></i></button>
+        </div>
+    </nav>
+    <div id="products"></div>
+    <button id="load-more" onclick="loadMoreProducts()">Load More</button>
+
+<script>
+let allProducts = []; // Store all products
+let allCategories = []; // Store all categories
+let currentIndex = 0; // Current index for loading products
+const productsPerPage = 3; // Number of products to display at a time
+let filteredProducts = []; // Store currently filtered products
+
+async function fetchProducts() {
+    try {
+        const response = await axios.get('/api/products');
+        allProducts = response.data;
+        filteredProducts = allProducts; // Initially set filtered products to all products
+        displayProducts(filteredProducts);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
+}
+
+async function fetchCategories() {
+    try {
+        const response = await axios.get('/api/categories');
+        allCategories = response.data;
+        displayCategories(allCategories);
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+    }
+}
+
+function displayCategories(categories) {
+    const categoriesDiv = document.getElementById('categories');
+    categoriesDiv.innerHTML = ''; // Clear existing buttons
+
+    categories.forEach(category => {
+        const button = document.createElement('button');
+        button.className = 'category-button';
+        button.innerText = category.name;
+        button.onclick = () => filterByCategory(category.name);
+        categoriesDiv.appendChild(button);
+    });
+}
+
+function displayProducts(products) {
+    const productsDiv = document.getElementById('products');
+    productsDiv.innerHTML = ''; // Clear existing products
+    currentIndex = 0; // Reset current index
+    loadMoreProducts(); // Load the first set of products
+}
+
+function loadMoreProducts() {
+    const productsDiv = document.getElementById('products');
+    const nextProducts = filteredProducts.slice(currentIndex, currentIndex + productsPerPage);
+    nextProducts.forEach(product => {
+        const productDiv = document.createElement('div');
+        productDiv.className = 'product';
+        productDiv.innerHTML = `<h2>${product.name}</h2>
+            <a href="product.html?id=${product.id}">
+                <img src="${product.image}" alt="${product.name}" />
+            </a>
+            <p>Category: ${product.category}</p>
+            <p>Price: $${product.price.toFixed(2)}</p>
+            <p>${product.description}</p>
+            <button class='category-button' onclick="addToCart('${product.id}')">Add to Cart</button>`;
+        productsDiv.appendChild(productDiv);
+        fadeIn(productDiv);
+    });
+    currentIndex += productsPerPage; // Update index
+
+    // Show or hide the Load More button
+    document.getElementById('load-more').style.display = currentIndex < filteredProducts.length ? 'block' : 'none';
+}
+
+function fadeIn(element) {
+    element.style.opacity = 0;
+    let last = +new Date();
+    const tick = function() {
+        element.style.opacity = +element.style.opacity + (new Date() - last) / 400;
+        last = +new Date();
+
+        if (+element.style.opacity < 1) {
+            requestAnimationFrame(tick);
+        }
+    };
+    tick();
+}
+
+function filterProducts() {
+    const searchTerm = document.getElementById('search').value.toLowerCase();
+    filteredProducts = allProducts.filter(product => 
+        product.name.toLowerCase().includes(searchTerm) || 
+        product.description.toLowerCase().includes(searchTerm // Check product description
+    ));
+    displayProducts(filteredProducts); // Display filtered products
+}
+
+function filterByCategory(category) {
+    filteredProducts = allProducts.filter(product => 
+        product.category === category
+    );
+    displayProducts(filteredProducts); // Display filtered products
+}
+
+function showAllProducts() {
+    filteredProducts = allProducts; // Reset filtered products to all products
+    displayProducts(filteredProducts); // Show all products
+}
+
+// Add to Cart function using local storage
+function addToCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || {}; // Get cart from local storage
+    cart[productId] = (cart[productId] || 0) + 1; // Increment quantity
+    localStorage.setItem('cart', JSON.stringify(cart)); // Save cart back to local storage
+    updateCartCount();
+}
+
+function removeFromCart(productId) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || {};
+    delete cart[productId]; // Remove the item from the cart
+    localStorage.setItem('cart', JSON.stringify(cart)); // Save the updated cart
+    updateCartCount(); // Refresh the cart display
+}
+
+// Update cart count from local storage
+function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || {};
+    const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+    document.getElementById('cart-count').innerText = totalCount;
+}
+
+function goToCart() {
+    window.location.href = 'cart.html'; // Redirect to cart page
+}
+
+// Redirect to home page
+function goToHome() {
+    window.location.href = 'index.html'; // Adjust based on your homepage filename
+}
+
+// Initialize functions
+fetchProducts();
+fetchCategories();
+updateCartCount(); // Update cart count on page load
+
+</script> 
+</body>
+</html>

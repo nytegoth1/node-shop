@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <style>
+
+    </style>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.6.0/css/all.min.css'>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="main-menu-wrapper__left">
+                <div onclick="goToHome()" class="main-menu-wrapper__logo">
+                <div class="logo">MySite</div>
+                </div>
+            </div>
+            <!-- <input type="text" id="search" placeholder="Search for products..." oninput="filterProducts()"> -->
+            <div id="categories"></div>
+            <!-- <button class="category-button" onclick="showAllProducts()">Show All Products</button> -->
+            <button class="category-button" onclick="goToCart()">View Cart <i id="cart-count" class="fas fa-shopping-cart"></i></button>
+        </div>
+    </nav>
+    <div class="product" id="prodname">
+
+    </div>
+    <div class="product" id="product"></div>
+
+    <footer class="product">
+        <button class="cartLink" onclick="goToHome()">Continue Shopping</button>
+        <button class="cartLink" id="checkout-button">Checkout</button>
+    </footer>
+    
+    <script>
+        async function fetchProduct() {
+        	const urlParams = new URLSearchParams(window.location.search);
+        	const productId = urlParams.get('id');
+
+        	try {
+        		const response = await axios.get(`/api/products/${productId}`);
+        		const product = response.data;
+        		displayProduct(product);
+        	} catch (error) {
+        		console.error('Error fetching product:', error);
+        		document.getElementById('product').innerHTML = 'Product not found.';
+        	}
+        }
+
+        function displayProduct(product) {
+        	const productDiv = document.getElementById('product');
+            const productNameDiv = document.getElementById('prodname');
+        	updateCartCount(); // Update cart count
+            productNameDiv.innerHTML = `
+                <h1>${product.name}</h1>`
+        	productDiv.innerHTML = `
+                <img src="${product.image}" alt="${product.name}"/>
+                <p>Category: ${product.category}</p>
+                <p>Price: $${product.price.toFixed(2)}</p>
+                <p>Product ID: ${product.id}</p>
+                <p>${product.description}</p>
+                <button class='category-button' onclick="addToCart('${product.id}')">Add to Cart</button>
+            `;
+        }
+
+        // Add to Cart function using local storage
+        function addToCart(productId) {
+        	let cart = JSON.parse(localStorage.getItem('cart')) || {}; // Get cart from local storage
+        	cart[productId] = (cart[productId] || 0) + 1; // Increment quantity
+        	localStorage.setItem('cart', JSON.stringify(cart)); // Save cart back to local storage
+        	updateCartCount();
+        }
+
+        function removeFromCart(productId) {
+        	const cart = JSON.parse(localStorage.getItem('cart')) || {};
+        	delete cart[productId]; // Remove the item from the cart
+        	localStorage.setItem('cart', JSON.stringify(cart)); // Save the updated cart
+        	updateCartCount(); // Refresh the cart display
+        }
+
+        // Update cart count from local storage
+        function updateCartCount() {
+        	const cart = JSON.parse(localStorage.getItem('cart')) || {};
+        	const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+        	document.getElementById('cart-count').innerText = totalCount;
+        }
+
+        function goToCart() {
+        	window.location.href = 'cart.html'; // Redirect to cart page
+        }
+
+        // Redirect to home page
+        function goToHome() {
+        	window.location.href = 'index.html'; // Adjust based on your homepage filename
+        }
+
+        fetchProduct();
+    </script>
+</body>
+</html>
