@@ -8,4 +8,4 @@ A minimal MPA created with Node.js
 
   # SCREEN
 
-  ![alt text](https://github.com/nytegoth1/node-shop/blob/main/screen1.png?raw=true)
+  ![alt text](https://github.com/nytegoth1/node-shop/blob/master/screen1.png?raw=true)
