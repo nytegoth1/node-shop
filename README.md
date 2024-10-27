@@ -1,11 +1,11 @@
 # node-shop
 A minimal MPA created with Node.js
 # Installation:
-Have node installed (Obviously).
-CMD npm install express cors
-CMD node server.js
-OPen browser: http://localhost:3025/
-Change the port if needed.
+Have node installed (Obviously).<br>
+CMD npm install express cors <br>
+CMD node server.js <br>
+Open browser: http://localhost:3025/ <br>
+Change the port if needed.<br>
 
 #   "dependencies": {
     "cors": "^2.8.5",
