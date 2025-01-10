@@ -1,10 +1,13 @@
 {
   "name": "shop-api",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nytegoth1/node-shop.git"
+  },
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "homepage": "https://nytegoth1.github.io/node-shop/"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
